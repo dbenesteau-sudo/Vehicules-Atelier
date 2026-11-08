@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d6e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prêts LVA">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>LVA – Prêts véhicules salariés</title>
+<style>
+:root{--b:#0b3d6e;--bg:#f6f8fb;--t:#16202c;--m:#6b7785;--l:#dde3ea;--ok:#1b8a4b;--ko:#c0392b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:16px/1.4 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--t);padding-bottom:env(safe-area-inset-bottom)}
+header{display:flex;gap:12px;align-items:center;background:#fff;border-bottom:1px solid var(--l);padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));position:sticky;top:0;z-index:5}
+header img{height:36px}
+header b{font-size:17px;color:var(--b)}
+main{max-width:640px;margin:0 auto;padding:14px}
+h2{font-size:18px;margin:18px 0 8px;color:var(--b)}
+label{display:block;margin:14px 0 4px;font-weight:600}
+.big{display:block;width:100%;min-height:64px;margin:10px 0;border-radius:14px;border:2px solid var(--b);background:#fff;color:var(--b);font-size:18px;font-weight:700}
+.primary{background:var(--b)!important;color:#fff!important}
+.btn{flex:1;min-height:52px;border-radius:12px;border:2px solid var(--b);background:#fff;color:var(--b);font-size:16px;font-weight:600;padding:0 12px}
+.btn:disabled{opacity:.35}
+.link{background:none;border:0;color:var(--b);text-decoration:underline;font-size:16px;padding:14px 0}
+.row{display:flex;gap:10px;margin:14px 0}
+.inp{width:100%;min-height:50px;padding:10px 12px;font-size:17px;border:1.5px solid var(--l);border-radius:12px;background:#fff;color:var(--t)}
+textarea.inp{min-height:76px}
+.card{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--l);border-radius:12px;padding:12px;margin:8px 0;cursor:pointer}
+.card small{color:var(--m)}
+.plate{font:700 15px ui-monospace,Menlo,monospace;border:2px solid #223;border-radius:6px;padding:4px 8px;white-space:nowrap;background:#fff}
+.badge{font-size:12px;font-weight:700;border-radius:6px;padding:2px 6px;background:#fde8e6;color:var(--ko)}
+.muted{color:var(--m)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:0 16px;border-radius:24px;border:2px solid var(--l);background:#fff;font-size:16px;font-weight:600;color:var(--t)}
+.chip.on{border-color:var(--b);background:var(--b);color:#fff}
+.chip.ko.on{background:var(--ko);border-color:var(--ko)}
+.shot{aspect-ratio:4/3;background:#e9eef4;border:2px dashed #b9c5d3;border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--m)}
+.shot img{width:100%;height:100%;object-fit:contain;background:#000}
+.prog{height:8px;background:var(--l);border-radius:4px;overflow:hidden;margin:6px 0 12px}
+.prog i{display:block;height:100%;background:var(--b);width:0;transition:width .3s}
+.note{color:var(--m);font-size:14px;margin-top:10px}
+.err{background:#fde8e6;color:var(--ko);border-radius:10px;padding:10px 12px;margin:10px 0}
+.warn{background:#fff4d6;color:#7a5a00;border-radius:10px;padding:10px 12px;margin:10px 0}
+.okbox{background:#e3f5ea;color:var(--ok);border-radius:10px;padding:10px 12px;margin:10px 0}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--l)}
+.kv span:first-child{color:var(--m)}
+.kv span:last-child{text-align:right;font-weight:600}
+canvas.sig{width:100%;height:190px;background:#fff;border:2px solid var(--b);border-radius:12px;touch-action:none;display:block}
+.mention{font-size:14px;color:var(--m);margin:10px 0}
+.defect{background:#fff;border:1px solid var(--l);border-radius:12px;padding:10px;margin:10px 0}
+.defect img{width:100%;max-height:220px;object-fit:contain;background:#000;border-radius:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid figure{margin:0}
+.grid .ph{aspect-ratio:4/3;background:#e9eef4;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--m)}
+.grid img{width:100%;height:100%;object-fit:cover}
+.grid figcaption{font-size:12px;color:var(--m);margin-top:2px}
+.center{text-align:center}
+.okmark{font-size:64px;color:var(--ok)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;color:#fff}
+.modal img{max-width:100%;max-height:80vh;object-fit:contain}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#16202c;color:#fff;border-radius:22px;padding:10px 18px;z-index:30;display:none;max-width:90%}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+'use strict';
+/* ===== Configuration ===== */
+const API_URL = 'https://script.google.com/macros/s/AKfycbylnrUuDpgJacF36aSyDA6nSaIIiDWXS8ztQxTYqAGnY2ZBon1TRPCoc7bzv1l1mxcm/exec';
+const VIEWS = ['Trois quarts avant gauche','Trois quarts avant droit','Trois quarts arrière droit','Trois quarts arrière gauche',
+  'Jante avant gauche','Jante avant droite','Jante arrière droite','Jante arrière gauche','Bas de caisse gauche','Bas de caisse droit'];
+const FUELS = ['Vide','1/4','1/2','3/4','Plein'];
+const MENTION_DEP = 'Je reconnais avoir pris possession du véhicule désigné ci-dessus et avoir pris connaissance de son état apparent, conformément aux photographies et observations figurant sur ce document. Je m’engage à signaler tout incident ou dommage survenu pendant son utilisation.';
+const MENTION_RET = 'Je confirme avoir restitué le véhicule désigné ci-dessus et avoir pris connaissance de l’état des lieux établi à la restitution, conformément aux photographies et observations figurant sur ce document.';
+const DMG = { none: 'Aucun nouveau dommage constaté', new: 'Nouveau dommage constaté', check: 'Vérification complémentaire nécessaire' };
+const MAX_PX = 1600, Q0 = 0.78, QMIN = 0.55, MAX_BYTES = 350 * 1024;
+
+/* ===== Utilitaires ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const pad = n => String(n).padStart(2, '0');
+const nowIso = () => new Date().toISOString();
+const fmtDt = s => { if (!s) return '—'; const d = new Date(s); return isNaN(d) ? s : d.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }); };
+const fmtKm = n => (Number(n) || 0).toLocaleString('fr-FR') + ' km';
+const plateKey = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const fmtPlate = s => { const k = plateKey(s), m = k.match(/^([A-Z]{2})(\d{3})([A-Z]{2})$/); return m ? m.slice(1).join('-') : k; };
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+const genId = () => { const d = new Date(); return 'PV-' + d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + '-' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds()) + '-' + Math.random().toString(36).slice(2, 5).toUpperCase(); };
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+let toastT; function toast(m, ms = 2200) { const t = $('#toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', ms); }
+function app(html) { $('#app').innerHTML = html; window.scrollTo(0, 0); }
+const hdr = t => `<header><img src="logo.png" alt="" onerror="this.style.display='none'"><b>${esc(t)}</b></header>`;
+function match(l, q) { if (!q || !q.trim()) return true; const pk = plateKey(q); return (pk && plateKey(l.plate).includes(pk)) || norm(l.employee).includes(norm(q)); }
+function errText(e) {
+  const m = String(e && e.message || e);
+  if (m.startsWith('DOUBLON')) return 'Un prêt est déjà en cours pour ce véhicule.';
+  const map = { VERROUILLE: 'Ce dossier est verrouillé (document déjà signé et archivé).',
+    HASH_DIFFERENT: 'Le PDF reçu ne correspond pas à celui envoyé. Réessayez.', KM_INCOHERENT: 'Kilométrage de retour inférieur au départ.', ETAT_INVALIDE: 'État du dossier incompatible avec cette action.' };
+  if (map[m]) return map[m];
+  if (m.startsWith('PHOTO_MANQUANTE')) return 'Photo manquante côté serveur (' + m.split(':')[1] + '). Réessayez.';
+  return 'Connexion impossible ou erreur (' + m + '). Le dossier est conservé sur ce téléphone : réessayez.';
+}
+
+async function api(action, data = {}, retries = 2) {
+  for (let i = 0; ; i++) {
+    try {
+      const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(Object.assign({ action }, data)) });
+      const j = await r.json();
+      if (!j.ok) throw Object.assign(new Error(j.error || 'ERREUR'), { server: true });
+      return j;
+    } catch (e) { if (e.server || i >= retries) throw e; await sleep(1500 * (i + 1)); }
+  }
+}
+
+/* ===== Brouillons (IndexedDB) ===== */
+const idb = () => new Promise((res, rej) => { const r = indexedDB.open('lva-prets', 1); r.onupgradeneeded = () => r.result.createObjectStore('d'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+async function dbOp(mode, fn) { const db = await idb(); return new Promise((res, rej) => { const t = db.transaction('d', mode); const q = fn(t.objectStore('d')); t.oncomplete = () => res(q && q.result); t.onerror = () => rej(t.error); }); }
+const dbSet = (k, v) => dbOp('readwrite', s => s.put(v, k));
+const dbGet = k => dbOp('readonly', s => s.get(k));
+const dbDel = k => dbOp('readwrite', s => s.delete(k));
+const dbAll = () => dbOp('readonly', s => s.getAll());
+const save = d => { if (d.id) dbSet(d.key, d).catch(() => toast('Sauvegarde locale impossible')); };
+
+/* ===== Photos ===== */
+async function compress(file) {
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (e) { bmp = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); }); }
+  const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight, sc = Math.min(1, MAX_PX / Math.max(w0, h0));
+  const w = Math.round(w0 * sc), h = Math.round(h0 * sc), c = document.createElement('canvas');
+  c.width = w; c.height = h; c.getContext('2d').drawImage(bmp, 0, 0, w, h);
+  let q = Q0, url = c.toDataURL('image/jpeg', q);
+  while (url.length * 0.75 > MAX_BYTES && q > QMIN) { q -= 0.06; url = c.toDataURL('image/jpeg', q); }
+  return { url, w, h };
+}
+function pickPhoto(cb) {
+  const f = document.createElement('input'); f.type = 'file'; f.accept = 'image/*'; f.setAttribute('capture', 'environment');
+  f.onchange = async () => { if (!f.files[0]) return; toast('Compression…', 4000); try { cb(await compress(f.files[0])); } catch (e) { toast('Photo illisible, recommencez'); } };
+  f.click();
+}
+
+/* ===== Écran d'accès / accueil ===== */
+let LOANS = []; try { LOANS = JSON.parse(lsGet('lva_loans') || '[]'); } catch (e) {}
+async function loadLoans() {
+  try { LOANS = (await api('list')).loans; lsSet('lva_loans', JSON.stringify(LOANS)); return true; }
+  catch (e) { return e; }
+}
+const card = l => `<div class="card" data-id="${esc(l.id)}"><div class="plate">${esc(fmtPlate(l.plate))}</div><div><b>${esc(l.employee)}</b>${l.status === 'EN_COURS' ? ' <span class="badge">EN COURS</span>' : ''}<br><small>Départ ${fmtDt(l.startAt)} · ${fmtKm(l.startKm)}${l.status === 'RESTITUE' ? '<br>Retour ' + fmtDt(l.endAt) + ' · ' + fmtKm(l.endKm) + ' (' + fmtKm(l.kmDone) + ' parcourus)' : ''}</small></div></div>`;
+const bindCards = (box, fn) => box.querySelectorAll('.card[data-id]').forEach(c => c.onclick = () => fn(c.dataset.id));
+
+async function home() {
+  if (!API_URL.startsWith('https://')) {
+    app(hdr('Prêts véhicules salariés') + `<main><div class="err">Application non configurée (URL du serveur manquante).</div></main>`); return;
+  }
+  app(hdr('Prêts véhicules salariés') + `<main>
+    <button class="big primary" id="bDep">🚗 GÉNÉRER UN BON DE PRÊT</button>
+    <button class="big" id="bRet">↩️ RESTITUER UNE VOITURE</button>
+    <div id="drafts"></div><div id="net"></div>
+    <h2>PRÊTS EN COURS</h2>
+    <input id="q" class="inp" placeholder="Immatriculation ou nom / prénom…" autocomplete="off">
+    <div id="list"></div>
+    <button class="link" id="bHist">Historique des prêts terminés</button></main>`);
+  $('#bDep').onclick = () => depInfo({ type: 'dep', step: 'info' });
+  $('#bRet').onclick = retPick;
+  $('#bHist').onclick = history_;
+  const draw = () => { const f = LOANS.filter(l => l.status === 'EN_COURS' && match(l, $('#q').value)); $('#list').innerHTML = f.length ? f.map(card).join('') : '<p class="muted">Aucun prêt en cours.</p>'; bindCards($('#list'), detail); };
+  $('#q').oninput = draw; draw();
+  dbAll().then(ds => {
+    ds = (ds || []).filter(x => x && x.key && x.type);
+    $('#drafts').innerHTML = ds.map(d => `<div class="card" data-k="${esc(d.key)}">⏸ <div><b>Reprendre : ${esc(fmtPlate(d.plate || (d.loan && d.loan.plate)))}</b><br><small>${d.type === 'dep' ? 'Bon de prêt' : 'Restitution'} non terminé(e) <a href="#" data-del="${esc(d.key)}">Supprimer</a></small></div></div>`).join('');
+    $('#drafts').querySelectorAll('[data-del]').forEach(a => a.onclick = async e => { e.preventDefault(); e.stopPropagation(); if (confirm('Supprimer ce brouillon ?')) { await dbDel(a.dataset.del); await dbDel('up:' + a.dataset.del); home(); } });
+    $('#drafts').querySelectorAll('.card').forEach(c => c.onclick = async () => route(await dbGet(c.dataset.k)));
+  }).catch(() => {});
+  const r = await loadLoans();
+  if (r !== true && $('#net')) $('#net').innerHTML = `<div class="warn">Hors ligne : liste enregistrée affichée.</div>`;
+  if ($('#q')) draw();
+}
+
+/* ===== Routage des étapes ===== */
+function route(d) {
+  save(d);
+  const f = { info: d.type === 'dep' ? depInfo : retInfo, photo: photoStep, defects: defectStep, compare: compareStep, sign: signStep, send: sendStep }[d.step];
+  f(d);
+}
+const chips = (cur, id = 'fuel') => `<div class="chips" id="${id}">${FUELS.map(f => `<button type="button" class="chip ${cur === f ? 'on' : ''}" data-v="${f}">${f}</button>`).join('')}</div>`;
+function bindChips(id, cb) { document.querySelectorAll('#' + id + ' .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#' + id + ' .chip').forEach(x => x.classList.remove('on')); c.classList.add('on'); cb(c.dataset.v); }); }
+
+/* ----- Départ : informations ----- */
+function depInfo(d) {
+  app(hdr('Nouveau bon de prêt') + `<main>
+    <label>Immatriculation *</label><input class="inp" id="plate" value="${esc(d.plateDisp || '')}" autocapitalize="characters" autocomplete="off" placeholder="AB-123-CD">
+    <label>Nom et prénom du salarié *</label><input class="inp" id="emp" value="${esc(d.employee || '')}" autocomplete="off">
+    <label>Kilométrage au départ *</label><input class="inp" id="km" type="number" inputmode="numeric" min="0" value="${d.km == null ? '' : d.km}">
+    <label>Niveau carburant / batterie *</label>${chips(d.fuel)}
+    <div class="note">La date et l’heure sont enregistrées automatiquement.</div>
+    <div id="msg"></div>
+    <div class="row"><button class="btn" id="bBack">Annuler</button><button class="btn primary" id="bGo">Continuer</button></div></main>`);
+  let fuel = d.fuel; bindChips('fuel', v => fuel = v);
+  $('#plate').oninput = e => { const p = e.target.selectionStart; e.target.value = e.target.value.toUpperCase(); };
+  $('#bBack').onclick = home;
+  $('#bGo').onclick = async () => {
+    const pk = plateKey($('#plate').value), emp = $('#emp').value.trim().replace(/\s+/g, ' '), km = $('#km').value;
+    const bad = pk.length < 4 ? 'Immatriculation obligatoire.' : !emp ? 'Nom et prénom obligatoires.' : (km === '' || Number(km) < 0) ? 'Kilométrage obligatoire.' : !fuel ? 'Indiquez le niveau de carburant / batterie.' : '';
+    if (bad) { $('#msg').innerHTML = `<div class="err">${bad}</div>`; return; }
+    $('#bGo').disabled = true;
+    const id = d.id || genId();
+    try {
+      const r = await api('check', { plate: pk }, 1);
+      if (r.open && r.open.id !== id) {
+        $('#msg').innerHTML = `<div class="err">Un prêt est déjà en cours pour ${esc(fmtPlate(pk))} (${esc(r.open.employee)}, depuis le ${fmtDt(r.open.startAt)}). <button class="link" id="bOpen">Ouvrir le dossier existant</button></div>`;
+        $('#bOpen').onclick = () => detail(r.open.id); $('#bGo').disabled = false; return;
+      }
+    } catch (e) { toast('Contrôle des doublons impossible hors ligne : vérifié à l’envoi', 3500); }
+    Object.assign(d, { type: 'dep', key: 'dep:' + id, id, plate: pk, plateDisp: fmtPlate(pk), employee: emp, km: Number(km), fuel,
+      startAt: d.startAt || nowIso(), photos: d.photos || [], defects: d.defects || [], i: 0, step: 'photo' });
+    route(d);
+  };
+}
+
+/* ----- Photos obligatoires (départ et retour) ----- */
+function photoStep(d) {
+  const i = d.i, ph = d.photos[i], ret = d.type === 'ret';
+  app(hdr((ret ? 'Restitution' : 'Départ') + ' · Photo ' + (i + 1) + '/10') + `<main>
+    <div class="prog"><i style="width:${(i + (ph ? 1 : 0)) * 10}%"></i></div>
+    <h2>${esc(VIEWS[i])}</h2>
+    <div class="shot">${ph ? `<img src="${ph.url}" alt="">` : 'Aucune photo'}</div>
+    <button class="big primary" id="bShot">${ph ? '📷 Reprendre la photo' : '📷 Prendre la photo'}</button>
+    ${ret ? '<button class="big" id="bRef">👁 Voir la photo du départ</button>' : ''}
+    <div class="row"><button class="btn" id="bPrev">← Précédent</button><button class="btn primary" id="bNext" ${ph ? '' : 'disabled'}>Suivant →</button></div></main>`);
+  $('#bShot').onclick = () => pickPhoto(p => { d.photos[i] = p; route(d); });
+  if (ret) $('#bRef').onclick = () => showRef(d, 'depart_' + pad(i + 1) + '.jpg', VIEWS[i]);
+  $('#bPrev').onclick = () => { if (i > 0) d.i--; else d.step = 'info'; route(d); };
+  $('#bNext').onclick = () => { if (i < 9) d.i++; else d.step = 'defects'; route(d); };
+}
+const IMG = {};
+async function getImg(id, name) { const k = id + '/' + name; if (!IMG[k]) { const j = await api('getFile', { id, name }); IMG[k] = 'data:' + j.mime + ';base64,' + j.data; } return IMG[k]; }
+function modalImg(url, cap) { const m = document.createElement('div'); m.className = 'modal'; m.innerHTML = `<div>${esc(cap || '')}</div>${url ? `<img src="${url}" alt="">` : '<p>Chargement…</p>'}<p class="note">Toucher pour fermer</p>`; m.onclick = () => m.remove(); document.body.appendChild(m); return m; }
+async function showRef(d, name, cap) {
+  const m = modalImg(null, 'Départ : ' + cap);
+  try { const u = await getImg(d.id, name); m.remove(); modalImg(u, 'Départ : ' + cap); } catch (e) { m.remove(); toast('Photo du départ indisponible (réseau)'); }
+}
+
+/* ----- Photos de défauts ----- */
+function defectStep(d) {
+  const ret = d.type === 'ret';
+  app(hdr(ret ? 'Nouveaux dégâts' : 'Défauts constatés') + `<main>
+    <button class="big primary" id="bAdd">📷 ${ret ? 'AJOUTER DES PHOTOS DE NOUVEAUX DÉGÂTS' : 'AJOUTER DES PHOTOS DES DÉFAUTS'}</button>
+    <div id="dl">${d.defects.map((x, k) => `<div class="defect"><img src="${x.url}" alt=""><textarea class="inp" data-k="${k}" placeholder="Commentaire (facultatif) : rayure sur une porte, jante abîmée…">${esc(x.comment || '')}</textarea><button class="btn" data-rm="${k}" style="width:100%;margin-top:8px">Supprimer cette photo</button></div>`).join('')}</div>
+    <p class="note">${d.defects.length ? d.defects.length + ' photo(s) ajoutée(s).' : 'Facultatif : passez à l’étape suivante s’il n’y a rien à signaler.'}</p>
+    <div class="row"><button class="btn" id="bPrev">← Précédent</button><button class="btn primary" id="bNext">${d.defects.length ? 'Continuer' : 'Aucun défaut → Continuer'}</button></div></main>`);
+  $('#bAdd').onclick = () => pickPhoto(p => { d.defects.push(Object.assign(p, { comment: '' })); route(d); });
+  let t; document.querySelectorAll('textarea[data-k]').forEach(a => a.oninput = () => { d.defects[a.dataset.k].comment = a.value; clearTimeout(t); t = setTimeout(() => save(d), 500); });
+  document.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { d.defects.splice(b.dataset.rm, 1); route(d); });
+  $('#bPrev').onclick = () => { d.step = 'photo'; d.i = 9; route(d); };
+  $('#bNext').onclick = () => { save(d); d.step = ret ? 'compare' : 'sign'; route(d); };
+}
+
+/* ----- Signature ----- */
+function sigPad(cv) {
+  const dpr = Math.max(1, window.devicePixelRatio || 1), r = cv.getBoundingClientRect();
+  cv.width = r.width * dpr; cv.height = r.height * dpr;
+  const x = cv.getContext('2d'); x.scale(dpr, dpr); x.lineWidth = 2.5; x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#000';
+  let down = false, ink = false;
+  const pos = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  cv.addEventListener('pointerdown', e => { down = true; cv.setPointerCapture(e.pointerId); const [p, q] = pos(e); x.beginPath(); x.moveTo(p, q); x.lineTo(p + 0.1, q); x.stroke(); ink = true; e.preventDefault(); });
+  cv.addEventListener('pointermove', e => { if (!down) return; const [p, q] = pos(e); x.lineTo(p, q); x.stroke(); x.beginPath(); x.moveTo(p, q); e.preventDefault(); });
+  ['pointerup', 'pointercancel'].forEach(ev => cv.addEventListener(ev, () => down = false));
+  return { clear() { x.clearRect(0, 0, cv.width, cv.height); ink = false; }, hasInk: () => ink };
+}
+function signStep(d) {
+  const dep = d.type === 'dep', L = dep ? d : d.loan;
+  const rows = dep ? [['Immatriculation', fmtPlate(d.plate)], ['Salarié', d.employee], ['Départ', fmtDt(d.startAt)], ['Kilométrage', fmtKm(d.km)], ['Carburant / batterie', d.fuel], ['Photos', '10 + ' + d.defects.length + ' défaut(s)']]
+    : [['Immatriculation', fmtPlate(L.plate)], ['Salarié', L.employee], ['Retour', fmtDt(d.endAt)], ['Kilométrage', fmtKm(d.endKm) + ' (' + fmtKm(d.endKm - L.startKm) + ' parcourus)'], ['Constat', DMG[d.damage]], ['Photos', '10 + ' + d.defects.length + ' dégât(s)']];
+  app(hdr('Récapitulatif et signature') + `<main>${rows.map(r => `<div class="kv"><span>${r[0]}</span><span>${esc(r[1])}</span></div>`).join('')}
+    <p class="mention">${esc(dep ? MENTION_DEP : MENTION_RET)}</p>
+    <canvas class="sig" id="cv"></canvas>
+    <div id="msg"></div>
+    <div class="row"><button class="btn" id="bClr">Effacer</button><button class="btn primary" id="bOk">Valider et signer</button></div>
+    <button class="link" id="bPrev">← Revenir en arrière</button></main>`);
+  const pad_ = sigPad($('#cv'));
+  $('#bClr').onclick = () => pad_.clear();
+  $('#bPrev').onclick = () => { d.step = dep ? 'defects' : 'compare'; route(d); };
+  $('#bOk').onclick = () => {
+    if (!pad_.hasInk()) { $('#msg').innerHTML = '<div class="err">Signez dans le cadre avec le doigt.</div>'; return; }
+    const cv = $('#cv'); d.sig = { url: cv.toDataURL('image/png'), w: cv.width, h: cv.height }; d.signedAt = nowIso(); d.step = 'send'; d.pdf = null; route(d);
+  };
+}
+
+/* ===== Restitution ===== */
+async function retPick() {
+  app(hdr('Restituer une voiture') + `<main><button class="btn" id="bBack" style="width:100%">← Accueil</button><input id="q" class="inp" placeholder="Immatriculation ou nom / prénom…" autocomplete="off" style="margin-top:12px"><div id="list"></div></main>`);
+  $('#bBack').onclick = home;
+  const draw = () => { const f = LOANS.filter(l => l.status === 'EN_COURS' && match(l, $('#q').value)); $('#list').innerHTML = f.length ? f.map(card).join('') : '<p class="muted">Aucun prêt en cours.</p>';
+    bindCards($('#list'), async id => { const l = LOANS.find(x => x.id === id); let d = await dbGet('ret:' + id); if (!d) d = { type: 'ret', key: 'ret:' + id, id, loan: l, step: 'info', photos: [], defects: [], i: 0 }; route(d); }); };
+  $('#q').oninput = draw; draw();
+  await loadLoans(); if ($('#q')) draw();
+}
+function retInfo(d) {
+  const L = d.loan;
+  app(hdr('Restitution') + `<main>
+    <div class="card" style="cursor:default"><div class="plate">${esc(fmtPlate(L.plate))}</div><div><b>${esc(L.employee)}</b><br><small>Départ ${fmtDt(L.startAt)} · ${fmtKm(L.startKm)} · ${esc(L.startFuel)}</small></div></div>
+    <label>Kilométrage de restitution *</label><input class="inp" id="km" type="number" inputmode="numeric" min="0" value="${d.endKm == null ? '' : d.endKm}">
+    <label>Niveau carburant / batterie *</label>${chips(d.endFuel)}
+    <label>Commentaires éventuels</label><textarea class="inp" id="cm">${esc(d.comment || '')}</textarea>
+    <div class="note">La date et l’heure sont enregistrées automatiquement.</div><div id="msg"></div>
+    <div class="row"><button class="btn" id="bBack">Annuler</button><button class="btn primary" id="bGo">Continuer</button></div></main>`);
+  let fuel = d.endFuel; bindChips('fuel', v => fuel = v);
+  $('#bBack').onclick = home;
+  $('#bGo').onclick = () => {
+    const km = $('#km').value, s = Number(L.startKm);
+    if (km === '') { $('#msg').innerHTML = '<div class="err">Kilométrage obligatoire.</div>'; return; }
+    if (Number(km) < s) { $('#msg').innerHTML = `<div class="err">Incohérent : le retour (${fmtKm(km)}) est inférieur au départ (${fmtKm(s)}).</div>`; return; }
+    if (Number(km) - s > 2000 && !confirm(fmtKm(Number(km) - s) + ' parcourus : confirmer ce kilométrage ?')) return;
+    if (!fuel) { $('#msg').innerHTML = '<div class="err">Indiquez le niveau de carburant / batterie.</div>'; return; }
+    Object.assign(d, { endKm: Number(km), endFuel: fuel, comment: $('#cm').value.trim(), endAt: d.endAt || nowIso(), step: 'photo', i: 0 }); route(d);
+  };
+}
+function compareStep(d) {
+  const L = d.loan, sd = (() => { try { return JSON.parse(L.startDefects || '[]'); } catch (e) { return []; } })();
+  app(hdr('État des lieux comparatif') + `<main>
+    <div class="kv"><span>Départ</span><span>${fmtDt(L.startAt)}<br>${fmtKm(L.startKm)}</span></div>
+    <div class="kv"><span>Retour</span><span>${fmtDt(d.endAt)}<br>${fmtKm(d.endKm)}</span></div>
+    <div class="kv"><span>Parcourus</span><span>${fmtKm(d.endKm - L.startKm)}</span></div>
+    <h2>Défauts signalés au départ</h2>${sd.length ? sd.map((c, k) => `<div class="kv"><span>Défaut ${k + 1}</span><span>${esc(c || 'sans commentaire')}</span></div>`).join('') : '<p class="muted">Aucun.</p>'}
+    <h2>Nouveaux défauts constatés</h2>${d.defects.length ? d.defects.map((x, k) => `<div class="kv"><span>Dégât ${k + 1}</span><span>${esc(x.comment || 'sans commentaire')}</span></div>`).join('') : '<p class="muted">Aucun ajouté.</p>'}
+    <h2>Photos départ / retour</h2><button class="btn" id="bView" style="width:100%">Comparer les photos une par une</button>
+    <h2>Constat *</h2><div class="chips" id="dm">${Object.keys(DMG).map(k => `<button class="chip ${k === 'new' ? 'ko' : ''} ${d.damage === k ? 'on' : ''}" data-v="${k}">${DMG[k]}</button>`).join('')}</div><div id="msg"></div>
+    <div class="row"><button class="btn" id="bPrev">← Précédent</button><button class="btn primary" id="bNext">Continuer</button></div></main>`);
+  bindChips('dm', v => { d.damage = v; save(d); });
+  $('#bView').onclick = () => compareView(d, 0);
+  $('#bPrev').onclick = () => { d.step = 'defects'; route(d); };
+  $('#bNext').onclick = () => { if (!d.damage) { $('#msg').innerHTML = '<div class="err">Choisissez un constat.</div>'; return; } d.step = 'sign'; route(d); };
+}
+async function compareView(d, i) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<b>${esc(VIEWS[i])} (${i + 1}/10)</b><div class="grid" style="width:100%;max-width:640px;margin:10px 0"><figure><div class="ph" id="a">Départ…</div></figure><figure><div class="ph" id="b"><img src="${d.photos[i].url}" alt=""></div></figure></div><div class="row" style="width:100%;max-width:640px"><button class="btn primary" id="p">←</button><button class="btn primary" id="x">Fermer</button><button class="btn primary" id="n">→</button></div>`;
+  document.body.appendChild(m);
+  m.querySelector('#x').onclick = () => m.remove();
+  m.querySelector('#p').onclick = () => { m.remove(); compareView(d, (i + 9) % 10); };
+  m.querySelector('#n').onclick = () => { m.remove(); compareView(d, (i + 1) % 10); };
+  try { const u = await getImg(d.id, 'depart_' + pad(i + 1) + '.jpg'); m.querySelector('#a').innerHTML = `<img src="${u}" alt="">`; } catch (e) { m.querySelector('#a').textContent = 'Indisponible'; }
+}
+
+/* ===== PDF ===== */
+let LOGO;
+async function logo() {
+  if (LOGO !== undefined) return LOGO;
+  try {
+    const r = await fetch('logo.png'); if (!r.ok) throw 0;
+    const b = await r.blob(), url = await new Promise(res => { const f = new FileReader(); f.onload = () => res(f.result); f.readAsDataURL(b); });
+    const im = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    LOGO = { url, w: im.naturalWidth, h: im.naturalHeight };
+  } catch (e) { LOGO = null; }
+  return LOGO;
+}
+function b64(buf) { let s = ''; const u = new Uint8Array(buf); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+async function sha256(buf) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', buf))].map(x => x.toString(16).padStart(2, '0')).join(''); }
+
+async function buildPdf(d) {
+  const { jsPDF } = window.jspdf, lg = await logo(), dep = d.type === 'dep', L = dep ? d : d.loan;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true }), W = 210, M = 14; let y = 0;
+  const head = () => {
+    if (lg) { const h = 14; doc.addImage(lg.url, 'PNG', M, 10, h * lg.w / lg.h, h); }
+    else { doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('Littoral Vendée Automobiles', M, 18); }
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.text('N° ' + d.id, W - M, 14, { align: 'right' }); y = 32;
+  };
+  const ensure = h => { if (y + h > 284) { doc.addPage(); head(); } };
+  const title = t => { doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.text(t, M, y); y += 9; };
+  const section = t => { ensure(14); y += 3; doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text(t, M, y); doc.setDrawColor(11, 61, 110); doc.line(M, y + 1.5, W - M, y + 1.5); y += 7; };
+  const kv = (k, v) => { ensure(6); doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.text(k, M, y); doc.setFont('helvetica', 'normal'); const t = doc.splitTextToSize(String(v), W - M - 70); doc.text(t, M + 56, y); y += 5.5 * t.length; };
+  const fit = (p, x, yy, bw, bh) => { const r = Math.min(bw / p.w, bh / p.h), dw = p.w * r, dh = p.h * r; doc.addImage(p.url, 'JPEG', x + (bw - dw) / 2, yy + (bh - dh) / 2, dw, dh, undefined, 'FAST'); };
+  const grid = (items, lab) => {
+    for (let k = 0; k < items.length; k += 2) {
+      ensure(82);
+      for (let c = 0; c < 2 && k + c < items.length; c++) {
+        const it = items[k + c], x = M + c * 94;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.text(lab(k + c), x, y);
+        fit(it, x, y + 2, 88, 62);
+        if (it.comment) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.text(doc.splitTextToSize(it.comment, 88).slice(0, 3), x, y + 68); }
+      }
+      y += 82;
+    }
+  };
+  head(); title(dep ? 'BON DE PRÊT VÉHICULE SALARIÉ' : 'BON DE RESTITUTION VÉHICULE SALARIÉ');
+  section(dep ? 'Prêt' : 'Prêt initial');
+  kv('Numéro de prêt', d.id); kv('Immatriculation', fmtPlate(L.plate)); kv('Salarié', L.employee);
+  kv('Date et heure de départ', fmtDt(L.startAt)); kv('Kilométrage de départ', fmtKm(L.startKm)); kv('Carburant / batterie au départ', L.startFuel);
+  if (!dep) {
+    section('Restitution');
+    kv('Date et heure de restitution', fmtDt(d.endAt)); kv('Kilométrage de restitution', fmtKm(d.endKm)); kv('Kilomètres parcourus', fmtKm(d.endKm - L.startKm));
+    kv('Carburant / batterie au retour', d.endFuel); kv('Constat', DMG[d.damage]); if (d.comment) kv('Commentaires', d.comment);
+  }
+  section(dep ? 'Photographies du véhicule au départ' : 'Photographies du véhicule à la restitution');
+  grid(d.photos, k => (k + 1) + '. ' + VIEWS[k]);
+  if (d.defects.length) { section(dep ? 'Défauts constatés au départ' : 'Nouveaux dégâts constatés'); grid(d.defects, k => (dep ? 'Défaut n° ' : 'Dégât n° ') + (k + 1)); }
+  else { section(dep ? 'Défauts constatés au départ' : 'Nouveaux dégâts constatés'); ensure(8); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text('Aucun.', M, y); y += 6; }
+  section('Reconnaissance et signature');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10); const mt = doc.splitTextToSize(dep ? MENTION_DEP : MENTION_RET, W - 2 * M); ensure(mt.length * 5 + 52); doc.text(mt, M, y); y += mt.length * 5 + 3;
+  const r = Math.min(70 / d.sig.w, 30 / d.sig.h); doc.addImage(d.sig.url, 'PNG', M, y, d.sig.w * r, d.sig.h * r); y += 32;
+  doc.setFontSize(9); doc.text('Signé par ' + L.employee + ' le ' + fmtDt(d.signedAt), M, y); y += 5;
+  const n = doc.getNumberOfPages(); for (let p = 1; p <= n; p++) { doc.setPage(p); doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.text('Page ' + p + '/' + n, W / 2, 290, { align: 'center' }); }
+  const buf = doc.output('arraybuffer'); return { b64: b64(buf), hash: await sha256(buf) };
+}
+async function sharePdf(data, name) {
+  const bytes = Uint8Array.from(atob(data), c => c.charCodeAt(0)), f = new File([bytes], name, { type: 'application/pdf' });
+  if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ===== Envoi / archivage ===== */
+async function sendStep(d) {
+  const dep = d.type === 'dep', pre = dep ? 'depart' : 'retour';
+  app(hdr('Enregistrement') + `<main><div class="prog"><i id="pb"></i></div><p id="st">Préparation…</p><div id="err"></div></main>`);
+  const st = t => { const e = $('#st'); if (e) e.textContent = t; }, pb = p => { const e = $('#pb'); if (e) e.style.width = p + '%'; };
+  try {
+    d.up = (await dbGet('up:' + d.key)) || {};
+    if (!d.pdf) { st('Création du PDF…'); const r = await buildPdf(d); d.pdf = r.b64; d.hash = r.hash; await dbSet(d.key, d); }
+    const pdfName = dep ? 'BON_DE_PRET_' + d.id + '.pdf' : 'BON_DE_RESTITUTION_' + d.id + '.pdf';
+    const tasks = d.photos.map((p, k) => ({ name: pre + '_' + pad(k + 1) + '.jpg', mime: 'image/jpeg', data: p.url.split(',')[1] }))
+      .concat(d.defects.map((p, k) => ({ name: pre + '_defaut_' + pad(k + 1) + '.jpg', mime: 'image/jpeg', data: p.url.split(',')[1] })))
+      .concat([{ name: pdfName, mime: 'application/pdf', data: d.pdf }]);
+    if (dep) { st('Création du dossier Google Drive…'); await api('create', { id: d.id, plate: d.plate, employee: d.employee, startAt: d.startAt, startKm: d.km, startFuel: d.fuel }); }
+    let n = 0;
+    for (const t of tasks) {
+      n++; st('Envoi ' + n + '/' + tasks.length + ' : ' + t.name); pb(n / (tasks.length + 1) * 100);
+      if (!d.up[t.name]) { await api('uploadFile', { id: d.id, name: t.name, mime: t.mime, data: t.data }); d.up[t.name] = 1; await dbSet('up:' + d.key, d.up); }
+    }
+    st('Vérification de l’archivage…');
+    if (dep) await api('finalizeDepart', { id: d.id, hash: d.hash, startDefects: d.defects.map(x => x.comment || '') });
+    else await api('finalizeReturn', { id: d.id, hash: d.hash, endAt: d.endAt, endKm: d.endKm, endFuel: d.endFuel, endComment: d.comment || '', damage: d.damage, endDefects: d.defects.map(x => x.comment || '') });
+    pb(100); await dbDel(d.key); await dbDel('up:' + d.key); loadLoans();
+    done(d, pdfName);
+  } catch (e) {
+    const dup = String(e.message).startsWith('DOUBLON') ? String(e.message).split(':')[1] : '';
+    $('#err').innerHTML = `<div class="err">${esc(errText(e))}</div><button class="big primary" id="bRetry">Réessayer</button>${dup ? '<button class="big" id="bOpen">Ouvrir le dossier existant</button>' : ''}<button class="big" id="bHome">Accueil (dossier conservé)</button>`;
+    $('#bRetry').onclick = () => sendStep(d); $('#bHome').onclick = home; if (dup) $('#bOpen').onclick = () => detail(dup);
+  }
+}
+function done(d, pdfName) {
+  const dep = d.type === 'dep';
+  app(hdr('Terminé') + `<main class="center"><div class="okmark">✔</div><h2>${dep ? 'Bon de prêt enregistré' : 'Restitution enregistrée — véhicule disponible'}</h2><p class="muted">Dossier archivé dans Google Drive.</p>
+    <button class="big primary" id="bPdf">📄 Télécharger / partager le PDF</button><button class="big" id="bHome">Accueil</button></main>`);
+  $('#bPdf').onclick = () => sharePdf(d.pdf, pdfName); $('#bHome').onclick = home;
+}
+
+/* ===== Dossier et historique ===== */
+const photoLabel = n => { const m = n.match(/^(depart|retour)_(defaut_)?(\d+)\.jpg$/); if (!m) return n; const k = Number(m[3]); return (m[1] === 'depart' ? 'Départ' : 'Retour') + ' – ' + (m[2] ? (m[1] === 'depart' ? 'Défaut ' : 'Dégât ') + k : VIEWS[k - 1]); };
+async function detail(id) {
+  app(hdr('Dossier') + `<main><button class="btn" id="bBack" style="width:100%">← Accueil</button><div id="c"><p class="muted">Chargement…</p></div></main>`);
+  $('#bBack').onclick = home;
+  try {
+    const { loan: l, files } = await api('getLoan', { id });
+    const pdfs = files.filter(f => /\.pdf$/.test(f.name));
+    $('#c').innerHTML = `<h2>${esc(fmtPlate(l.plate))} · ${esc(l.employee)} ${l.status === 'EN_COURS' ? '<span class="badge">EN COURS</span>' : ''}</h2>
+      <div class="kv"><span>Départ</span><span>${fmtDt(l.startAt)}<br>${fmtKm(l.startKm)} · ${esc(l.startFuel)}</span></div>
+      ${l.status === 'RESTITUE' ? `<div class="kv"><span>Retour</span><span>${fmtDt(l.endAt)}<br>${fmtKm(l.endKm)} · ${esc(l.endFuel)}</span></div><div class="kv"><span>Parcourus</span><span>${fmtKm(l.kmDone)}</span></div><div class="kv"><span>Constat</span><span>${esc(DMG[l.damageStatus] || '')}</span></div>${l.endComment ? `<div class="kv"><span>Commentaire</span><span>${esc(l.endComment)}</span></div>` : ''}` : ''}
+      ${l.status === 'EN_COURS' ? '<button class="big primary" id="bRet">↩️ Lancer la restitution</button>' : ''}
+      ${pdfs.map(f => `<button class="big" data-pdf="${esc(f.name)}">📄 ${f.name.startsWith('BON_DE_PRET') ? 'PDF de départ' : 'PDF de restitution'}</button>`).join('')}
+      <button class="big" id="bPh">🖼 Voir les photos (${files.filter(f => /\.jpg$/.test(f.name)).length})</button><div class="grid" id="ph"></div>
+      <button class="link" id="bVer">Vérifier l’intégrité des PDF signés</button><div id="ver"></div>
+      <p class="note"><a href="${esc(l.folderUrl)}" target="_blank" rel="noopener">Ouvrir le dossier Google Drive</a></p>`;
+    if (l.status === 'EN_COURS') $('#bRet').onclick = async () => { let d = await dbGet('ret:' + id); if (!d) d = { type: 'ret', key: 'ret:' + id, id, loan: l, step: 'info', photos: [], defects: [], i: 0 }; route(d); };
+    document.querySelectorAll('[data-pdf]').forEach(b => b.onclick = async () => { b.disabled = true; try { sharePdf((await api('getFile', { id, name: b.dataset.pdf })).data, b.dataset.pdf); } catch (e) { toast(errText(e)); } b.disabled = false; });
+    $('#bVer').onclick = async () => { try { const v = await api('verify', { id }); const t = { INTACT: '✔ intact', MODIFIE: '⚠ MODIFIÉ', ABSENT: '⚠ absent', NON_APPLICABLE: '—' }; $('#ver').innerHTML = `<div class="${v.depart === 'MODIFIE' || v.retour === 'MODIFIE' ? 'err' : 'okbox'}">PDF départ : ${t[v.depart]}<br>PDF restitution : ${t[v.retour]}</div>`; } catch (e) { toast(errText(e)); } };
+    $('#bPh').onclick = async () => {
+      const imgs = files.filter(f => /\.jpg$/.test(f.name)), box = $('#ph');
+      box.innerHTML = imgs.map(f => `<figure><div class="ph" data-n="${f.name}">…</div><figcaption>${esc(photoLabel(f.name))}</figcaption></figure>`).join('');
+      for (const f of imgs) { const el = box.querySelector('[data-n="' + f.name + '"]'); try { const u = await getImg(id, f.name); el.innerHTML = `<img src="${u}" alt="">`; el.onclick = () => modalImg(u, photoLabel(f.name)); } catch (e) { el.textContent = 'Erreur'; } }
+    };
+  } catch (e) { $('#c').innerHTML = `<div class="err">${esc(errText(e))}</div>`; }
+}
+async function history_() {
+  app(hdr('Historique') + `<main><button class="btn" id="bBack" style="width:100%">← Accueil</button><input id="q" class="inp" placeholder="Immatriculation ou nom / prénom…" autocomplete="off" style="margin-top:12px"><div id="sum" class="note"></div><div id="list"></div></main>`);
+  $('#bBack').onclick = home;
+  const draw = () => {
+    const q = $('#q').value, f = LOANS.filter(l => (q.trim() ? true : l.status === 'RESTITUE') && match(l, q)).sort((a, b) => (b.startAt || '').localeCompare(a.startAt || ''));
+    $('#sum').textContent = q.trim() ? f.length + ' prêt(s) · ' + new Set(f.map(l => l.plate)).size + ' véhicule(s) · ' + new Set(f.map(l => norm(l.employee))).size + ' salarié(s)' : 'Prêts terminés (les plus récents en premier)';
+    $('#list').innerHTML = f.length ? f.map(card).join('') : '<p class="muted">Aucun résultat.</p>'; bindCards($('#list'), detail);
+  };
+  $('#q').oninput = draw; draw(); await loadLoans(); if ($('#q')) draw();
+}
+
+/* ===== Démarrage ===== */
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+home();
+</script>
+</body>
+</html>
